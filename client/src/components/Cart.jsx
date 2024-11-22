@@ -1,13 +1,37 @@
-import { useSelector } from "react-redux";
 import CartItem from "./CartItem";
 import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
+
 function Cart() {
-  const selector = useSelector((store) => store.cart.cartItems);
+  const [fetchedData, setFetchedData] = useState([]);
+  const [deleteItem, setDeleteItem] = useState(true);
+
+  async function gettingCartItem() {
+    fetch("/api/getCartItem", {
+      method: "GET",
+    })
+      .then((data) => data.json())
+      .then((data) => setFetchedData(data))
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  useEffect(() => {
+    gettingCartItem();
+  }, [deleteItem]);
+
   return (
     <div>
       <div className="flex flex-col gap-2">
-        {selector.map((item) => {
-          return <CartItem singelSelect={item} key={item.id} />;
+        {fetchedData?.map((item) => {
+          return (
+            <CartItem
+              singelSelect={item}
+              key={item.id}
+              deleteItem={deleteItem}
+              setDeleteItem={setDeleteItem}
+            />
+          );
         })}
       </div>
       <Outlet />

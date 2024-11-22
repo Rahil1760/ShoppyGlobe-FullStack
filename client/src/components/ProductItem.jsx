@@ -1,29 +1,43 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { addToCart } from "./Redux/cartSlice";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { cartItemCounter } from "./Redux/cartSlice";
+import { useDispatch } from "react-redux";
 
 function ProductItem({ single }) {
   const [add2cart, setAdd2Cart] = useState("Add to Cart");
-  let length = single.images[2];
   const dispatch = useDispatch();
-  const select = useSelector((store) => store.cart.isInCart);
-  useEffect(() => {
-    select ? alert("In the Cart") : "";
-  }, [select]);
-  function handleAddtoCart(product) {
+  let length = single.images[2];
+ 
+  function handleAddtoCart() {
     if (add2cart == "added") {
       return 0;
     } else if (add2cart == "Add to Cart") {
-      dispatch(addToCart({ ...product, qty: 1 }));
+      fetch('/api/addToCart', {
+    method: 'POST',
+    headers: {
+          'Content-Type': 'application/json'
+    },
+  body: JSON.stringify({
+    "title": single.title,
+    "description": single.description,
+    "brand" : single.brand,
+    "rating" : single.rating,
+    "price" : single.price,
+    "images" : single.images,
+    "reviews": single.reviews,
+    "qty" : 1   
+  })
+})
       setAdd2Cart("Added");
+       dispatch(cartItemCounter());
     }
   }
   return (
     <div className="w-[47%] h-[400px] md:w-1/5 bg-slate-100 mt-10 rounded-md pb-4">
       <div className="h-1/2 w-full bg-slate-100">
-        <Link to={`ProductItem/${single?.id}`}>
+        <Link to={`ProductItem/${single._id}`}>
+        
           <LazyLoadImage src={length ? single.images[2] : single.images[0]} />
         </Link>
       </div>
@@ -35,8 +49,8 @@ function ProductItem({ single }) {
         </p>
         <div>
           <input
-            className="bg-yellow-600 px-4 rounded-md mt-2 cursor-pointer "
-            onClick={(e) => handleAddtoCart(single)}
+            className="bg-purple-600 px-4 rounded-md mt-2 cursor-pointer "
+            onClick={handleAddtoCart}
             value={add2cart}
             type="button"
           />

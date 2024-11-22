@@ -4,10 +4,11 @@ import { routing } from "./routes/productAdd.routes.js";
 const app = express();
 import cors from "cors"
 //app.use(cors());
-app.use(cors({ origin: 'http://localhost:5173/' }));
+app.use(cors({ origin: 'http://localhost:5173' }));
+// app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.listen(3000, () => {
-    console.log("first")
+    console.log("Running on port 3000")
 })
 
 

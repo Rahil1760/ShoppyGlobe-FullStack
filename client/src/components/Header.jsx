@@ -5,8 +5,22 @@ import searchLogo from "./Images/search.png";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 function Header({ handleClickFilter }) {
+  
+const counterItem = useSelector((store) => store.cart.counter);
+  
   const [inputVal, setinputVal] = useState("");
-  const select = useSelector((store) => store.cart.cartItems);
+  const [select, setSelect] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/getCartItem", {
+      method: "GET"
+    })
+      .then(data => data.json())
+      .then(data => setSelect(data)).catch(error => { 
+        console.log(error)
+      })
+  }, [counterItem]);
+  // const select = useSelector((store) => store.cart.cartItems);
   useEffect(() => {
     handleClickFilter(inputVal);
   }, [inputVal]);
@@ -19,21 +33,13 @@ function Header({ handleClickFilter }) {
             <img src={shoppingLogo} className="md:w-20 w-full" />
           </Link>
         </div>
-        <div className="w-1/2 relative ">
+        <div className="w-1/2 ">
           <input
             type="text"
-            placeholder="Search"
-            className="w-full text-center outline-none "
+            placeholder="Search.."
+            className="w-full text-center outline-none rounded-xl"
             onChange={(e) => setinputVal(e.target.value)}
           />
-          <div className="absolute left-full -top-0 mr-4 ">
-            <button
-              className="bg-blue-300 w-8 rounded-r-xl flex justify-center items-center"
-              // onClick={() => handleClickFilter(inputVal)}
-            >
-              <img src={searchLogo} className="w-6 h-6" />
-            </button>
-          </div>
         </div>
         <div className="">
           <Link to={"/ProductList/cartItem"}>

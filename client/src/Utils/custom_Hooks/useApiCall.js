@@ -1,23 +1,22 @@
 import { useState, useEffect } from "react";
-
+import { updateProducts } from "../../components/Redux/productDataSlice";
+import { useDispatch } from "react-redux";
 function useApiCall() {
+  const dispatch = useDispatch();
   const [fetchedData, setFetchedData] = useState(null);
   useEffect(() => {
     getData();
-  },[])
+  }, [])
   async function getData() {
     try {
-      
-      const data = await fetch("http://localhost:3000/api/getAllProducts");
-      //const data = await fetch('https://dummyjson.com/products');
-      console.log("Data", data);
+      const data = await fetch("/api/getAllProducts");
       const responce = await data.json();
-      setFetchedData(responce)
-      //setFetchedData(responce.products)
+      setFetchedData(responce);
+      dispatch(updateProducts(responce))
     } catch (err) {
-      console.log("err",err)
+    console.log(err)
     }
-    
+
   }
   return fetchedData;
 }

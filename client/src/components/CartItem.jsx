@@ -1,27 +1,55 @@
 import { useState } from "react";
+import { showCartItemCounter, cartItemWithQuantityCounter } from "./Redux/cartSlice";
 import { useDispatch } from "react-redux";
-import { decreaseQty, increaseQty, removeCartItem } from "./Redux/cartSlice";
-function CartItem({ singelSelect }) {
-  const dispatch = useDispatch();
 
-  const [quantity, setquantity] = useState(1);
-  const handleIncrement = (singelSelect) => {
-    setquantity(quantity + 1);
-    dispatch(increaseQty(singelSelect.id));
+function CartItem({ singelSelect, deleteItem, setDeleteItem }) {
+
+  const dispatch = useDispatch();
+  const [quantity, setquantity] = useState(singelSelect.qty);
+  const handleIncrement = (itemId) => {
+    dispatch(cartItemWithQuantityCounter());
+    fetch(`/api/increaseQuantity/${itemId}`, {
+      method: "PUT"
+    })
+      .then(data => data.json())
+      .then(data => data).catch(error => {
+
+      })
+    setquantity(quantity + 1)
   };
-  const handleDeccreement = (singelSelect1) => {
-    if (quantity == 1) {
-      return;
+  const handleDeccreement = (itemId) => {
+    if (quantity === 1) {
+      return
     } else {
-      setquantity(quantity - 1);
-      dispatch(decreaseQty(singelSelect1.id));
+      setquantity(quantity - 1)
+      dispatch(cartItemWithQuantityCounter());
+      fetch(`/api/deccreaseQuantity/${itemId}`, {
+        method: "PUT"
+      })
+        .then(data => data.json())
+        .then(data => data).catch(error => {
+
+        })
     }
+
+
+
   };
   function handleRemoveItem(itemId) {
-    dispatch(removeCartItem(itemId));
+    dispatch(showCartItemCounter());
+    dispatch(cartItemWithQuantityCounter());
+    fetch(`/api/deleteProduct/${itemId}`, {
+      method: "DELETE"
+    })
+      .then(data => data.json())
+      .then(data => data).catch(error => {
+
+      })
+    setDeleteItem(!deleteItem)
   }
 
   let image = singelSelect.images[2];
+
   return (
     <div className="">
       <div className="flex w-full h-1/2 justify-around bg-slate-100">
@@ -49,7 +77,7 @@ function CartItem({ singelSelect }) {
             <div className="flex justify-center items-center">
               <button
                 className="h-6 w-6 rounded-md font-bold bg-slate-400 flex justify-center items-center mb-2"
-                onClick={() => handleIncrement(singelSelect)}
+                onClick={() => handleIncrement(singelSelect._id)}
               >
                 +
               </button>
@@ -60,14 +88,14 @@ function CartItem({ singelSelect }) {
             <div className="flex bg-slate-400 rounded-md h-6 w-6 justify-center">
               <button
                 className=" rounded-md font-bold h-1/2 w-1/2"
-                onClick={() => handleDeccreement(singelSelect)}
+                onClick={() => handleDeccreement(singelSelect._id)}
               >
                 -
               </button>
             </div>
             <div className="ml-5">
               <button
-                onClick={() => handleRemoveItem(singelSelect.id)}
+                onClick={() => handleRemoveItem(singelSelect._id)}
                 className="bg-red-600 text-white px-1 rounded-md mb-2"
               >
                 Remove Item
